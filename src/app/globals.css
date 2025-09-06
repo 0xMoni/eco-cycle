@@ -5,7 +5,23 @@
   --foreground: #171717;
 }
 
-@theme inline {
+/* Hide Next.js development overlay */
+[data-nextjs-scroll-focus-boundary] {
+  display: none !important;
+}
+
+/* Hide Next.js build indicator */
+[data-nextjs-dialog-overlay] {
+  display: none !important;
+}
+
+/* Hide any Next.js development indicators */
+[data-nextjs-toast] {
+  display: none !important;
+}
+
+/* CSS custom properties for theming */
+:root {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
