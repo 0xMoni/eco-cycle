@@ -45,10 +45,8 @@ class StorageService {
   }
 
   setCurrentUser(user: User | null): void {
-    console.log('Storage: Setting current user to:', user);
     this.currentUser = user;
     this.saveToLocalStorage();
-    console.log('Storage: Current user set, saved to localStorage');
   }
 
   getCurrentUser(): User | null {
@@ -144,10 +142,8 @@ class StorageService {
 
   // Cart methods
   addToCart(productId: string, quantity: number = 1): CartItem {
-    console.log('Storage: Adding to cart, productId:', productId, 'quantity:', quantity);
     const product = this.getProductById(productId);
     if (!product) {
-      console.error('Storage: Product not found for ID:', productId);
       throw new Error('Product not found');
     }
 
@@ -155,7 +151,6 @@ class StorageService {
     if (existingItem) {
       existingItem.quantity += quantity;
       this.saveToLocalStorage();
-      console.log('Storage: Updated existing cart item, new quantity:', existingItem.quantity);
       return existingItem;
     }
 
@@ -168,12 +163,10 @@ class StorageService {
     };
     this.cartItems.push(cartItem);
     this.saveToLocalStorage();
-    console.log('Storage: Added new cart item, total cart items:', this.cartItems.length);
     return cartItem;
   }
 
   getCartItems(): CartItem[] {
-    console.log('Storage: Getting cart items, count:', this.cartItems.length);
     return this.cartItems;
   }
 
@@ -220,6 +213,10 @@ class StorageService {
       totalAmount: product.price,
     };
     this.purchases.push(purchase);
+
+    // Mark product as sold/unavailable
+    this.updateProduct(productId, { isAvailable: false });
+
     this.saveToLocalStorage();
     return purchase;
   }
@@ -250,11 +247,40 @@ class StorageService {
       const data = localStorage.getItem('ecocycle_data');
       if (data) {
         const parsed = JSON.parse(data);
-        this.users = parsed.users || [];
-        this.products = parsed.products || [];
-        this.cartItems = parsed.cartItems || [];
-        this.purchases = parsed.purchases || [];
-        this.currentUser = parsed.currentUser || null;
+        // Convert date strings back to Date objects
+        this.users = (parsed.users || []).map((u: User) => ({
+          ...u,
+          createdAt: new Date(u.createdAt),
+          updatedAt: new Date(u.updatedAt),
+        }));
+        this.products = (parsed.products || []).map((p: Product) => ({
+          ...p,
+          createdAt: new Date(p.createdAt),
+          updatedAt: new Date(p.updatedAt),
+          seller: p.seller ? {
+            ...p.seller,
+            createdAt: new Date(p.seller.createdAt),
+            updatedAt: new Date(p.seller.updatedAt),
+          } : p.seller,
+        }));
+        this.cartItems = (parsed.cartItems || []).map((c: CartItem) => ({
+          ...c,
+          addedAt: new Date(c.addedAt),
+          product: c.product ? {
+            ...c.product,
+            createdAt: new Date(c.product.createdAt),
+            updatedAt: new Date(c.product.updatedAt),
+          } : c.product,
+        }));
+        this.purchases = (parsed.purchases || []).map((p: Purchase) => ({
+          ...p,
+          purchaseDate: new Date(p.purchaseDate),
+        }));
+        this.currentUser = parsed.currentUser ? {
+          ...parsed.currentUser,
+          createdAt: new Date(parsed.currentUser.createdAt),
+          updatedAt: new Date(parsed.currentUser.updatedAt),
+        } : null;
       }
     }
   }
@@ -263,40 +289,36 @@ class StorageService {
   clearAllData(): void {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('ecocycle_data');
-      localStorage.removeItem('ecofinds_data'); // Remove old key too
+      localStorage.removeItem('ecofinds_data');
     }
     this.users = [];
     this.products = [];
     this.cartItems = [];
     this.purchases = [];
     this.currentUser = null;
-    console.log('All data cleared');
   }
 
   // Initialize with sample data
   initializeSampleData(): void {
-    console.log('Initializing sample data, current users:', this.users.length, 'current products:', this.products.length);
     if (this.users.length === 0) {
       // Create sample users
       const user1 = this.createUser({
         email: 'demo@ecofinds.com',
         username: 'DemoUser',
       });
-      
+
       const user2 = this.createUser({
         email: 'seller@ecofinds.com',
         username: 'EcoSeller',
       });
-      
+
       const user3 = this.createUser({
         email: 'buyer@ecofinds.com',
         username: 'GreenBuyer',
       });
-      
+
       // Set current user to DemoUser for login
-      console.log('Setting current user to:', user1);
       this.setCurrentUser(user1);
-      console.log('Current user after setting:', this.getCurrentUser());
       
       // Create one product from each category
       this.createProductWithSeller({
@@ -384,10 +406,6 @@ class StorageService {
         price: 4000,
         imageUrl: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400',
       }, user3);
-      
-      console.log('Sample data created successfully. Products:', this.products.length);
-    } else {
-      console.log('Sample data already exists. Products:', this.products.length);
     }
   }
 }

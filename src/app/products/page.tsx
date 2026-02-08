@@ -6,14 +6,7 @@ import { useProductStore } from '@/store/productStore';
 import { useCartStore } from '@/store/cartStore';
 import Navigation from '@/components/Navigation';
 import { Product, ProductCategory } from '@/types';
-import { 
-  Search, 
-  Filter, 
-  ShoppingCart, 
-  Package, 
-  Star,
-  Eye
-} from 'lucide-react';
+import { Search, Filter, ShoppingCart, Package } from 'lucide-react';
 
 const categories: { value: ProductCategory | 'All'; label: string }[] = [
   { value: 'All', label: 'All Categories' },
@@ -29,12 +22,11 @@ const categories: { value: ProductCategory | 'All'; label: string }[] = [
 ];
 
 export default function ProductsPage() {
-  const { 
-    filteredProducts, 
-    loadProducts, 
-    searchProducts, 
+  const {
+    filteredProducts,
+    loadProducts,
+    searchProducts,
     filterByCategory,
-    filters 
   } = useProductStore();
   const { addToCart } = useCartStore();
   
@@ -42,22 +34,8 @@ export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState<ProductCategory | 'All'>('All');
 
   useEffect(() => {
-    console.log('Products page: Loading products...');
     loadProducts();
   }, [loadProducts]);
-
-  // Force refresh products on page load
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      console.log('Products page: Force refreshing products...');
-      loadProducts();
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    console.log('Products page: filteredProducts changed:', filteredProducts.length);
-  }, [filteredProducts]);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -74,7 +52,6 @@ export default function ProductsPage() {
   };
 
   const handleAddToCart = (product: Product) => {
-    console.log('Adding product to cart:', product.title);
     addToCart(product);
   };
 
@@ -172,19 +149,19 @@ interface ProductCardProps {
 
 function ProductCard({ product, onAddToCart }: ProductCardProps) {
   return (
-    <div className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
+    <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden">
       {/* Product Image */}
       <Link href={`/products/${product.id}`}>
-        <div className="aspect-w-16 aspect-h-12 bg-gray-200 rounded-t-lg overflow-hidden cursor-pointer">
+        <div className="aspect-square bg-gray-100 overflow-hidden cursor-pointer">
           {product.imageUrl ? (
             <img
               src={product.imageUrl}
               alt={product.title}
-              className="w-full h-48 object-cover hover:scale-105 transition-transform"
+              className="w-full h-full object-cover hover:scale-105 transition-transform"
             />
           ) : (
-            <div className="w-full h-48 flex items-center justify-center">
-              <Package className="h-12 w-12 text-gray-400" />
+            <div className="w-full h-full flex items-center justify-center">
+              <Package className="h-16 w-16 text-gray-300" />
             </div>
           )}
         </div>
@@ -192,44 +169,32 @@ function ProductCard({ product, onAddToCart }: ProductCardProps) {
 
       {/* Product Info */}
       <div className="p-4">
-        <div className="flex items-start justify-between mb-2">
-          <Link href={`/products/${product.id}`}>
-            <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 hover:text-green-600 cursor-pointer">
-              {product.title}
-            </h3>
-          </Link>
-          <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
-            {product.category}
-          </span>
-        </div>
-
-        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+          {product.category}
+        </span>
+        <Link href={`/products/${product.id}`}>
+          <h3 className="mt-2 text-base font-semibold text-gray-900 line-clamp-1 hover:text-green-600">
+            {product.title}
+          </h3>
+        </Link>
+        <p className="text-gray-500 text-sm mt-1 line-clamp-2">
           {product.description}
         </p>
 
-        <div className="flex items-center justify-between">
-          <div className="text-2xl font-bold text-green-600">
+        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+          <div className="text-xl font-bold text-green-600">
             ₹{product.price}
           </div>
           <button
             onClick={() => onAddToCart(product)}
-            className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            className="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700"
           >
             <ShoppingCart className="h-4 w-4 mr-1" />
-            Add to Cart
+            Add
           </button>
         </div>
 
-        <div className="mt-3 flex items-center justify-between text-sm text-gray-500">
-          <span>by {product.seller.username}</span>
-          <Link 
-            href={`/products/${product.id}`}
-            className="flex items-center text-green-600 hover:text-green-700"
-          >
-            <Eye className="h-4 w-4 mr-1" />
-            <span>View Details</span>
-          </Link>
-        </div>
+        <p className="mt-2 text-xs text-gray-400">by {product.seller.username}</p>
       </div>
     </div>
   );

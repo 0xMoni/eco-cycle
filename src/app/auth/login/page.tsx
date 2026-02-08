@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuthStore } from '@/store/authStore';
 import { toast } from 'react-hot-toast';
-import { Eye, EyeOff, Leaf } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -81,25 +81,23 @@ export default function LoginPage() {
         {/* Logo and Title */}
         <div className="text-center mb-8">
           <div className="flex justify-center">
-            <img 
-              src="/mvp-assets/icons/logo.png" 
-              alt="EcoCycle Logo" 
-              className="h-16 w-16 object-contain"
-            />
+            <div className="w-16 h-16 rounded-2xl bg-green-50 p-2 flex items-center justify-center">
+              <img
+                src="/mvp-assets/icons/logo.png"
+                alt="EcoCycle Logo"
+                className="w-full h-full object-contain"
+              />
+            </div>
           </div>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            {isLogin ? 'Welcome back to' : 'Join'} EcoCycle
+          <h2 className="mt-5 text-2xl font-bold text-gray-900">
+            {isLogin ? 'Welcome back to ' : 'Join '}
+            <span className="text-green-600">EcoCycle</span>
           </h2>
-          <p className="mt-1 text-sm text-green-600 font-bold">
-            Sustainability on Repeat
+          <p className="mt-2 text-sm text-gray-500">
+            {isLogin
+              ? 'Sign in to continue to your account'
+              : 'Create your account to start buying and selling'}
           </p>
-          <p className="mt-2 text-sm text-gray-600">
-            {isLogin 
-              ? 'Sign in to your account to continue' 
-              : 'Create your account to start selling and buying sustainably'
-            }
-          </p>
-          
         </div>
 
         {/* Form Box */}
@@ -219,26 +217,31 @@ export default function LoginPage() {
               </button>
             </div>
 
+            {isLogin && (
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => toast.error('Please contact support to reset your password')}
+                  className="text-sm text-gray-500 hover:text-gray-700"
+                >
+                  Forgot password?
+                </button>
+              </div>
+            )}
+
             <div className="text-center">
               <button
                 type="button"
                 onClick={toggleMode}
                 className="text-sm text-green-600 hover:text-green-500 font-medium"
               >
-                {isLogin 
-                  ? "Don't have an account? Sign up" 
+                {isLogin
+                  ? "Don't have an account? Sign up"
                   : "Already have an account? Sign in"
                 }
               </button>
             </div>
           </form>
-        </div>
-
-        {/* Demo Info */}
-        <div className="mt-6 p-4 bg-blue-50 rounded-md">
-          <p className="text-sm text-blue-800">
-            <strong>Demo Mode:</strong> Use any email and password to login, or register with a new email.
-          </p>
         </div>
       </div>
     </div>

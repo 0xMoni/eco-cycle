@@ -1,15 +1,17 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useProductStore } from '@/store/productStore';
+import { useAuthStore } from '@/store/authStore';
 import Navigation from '@/components/Navigation';
 import { toast } from 'react-hot-toast';
-import { ArrowLeft, Upload, Save } from 'lucide-react';
-import { ProductCategory } from '@/types';
+import { ArrowLeft, Upload, Save, Loader2 } from 'lucide-react';
+import { ProductCategory, Product } from '@/types';
+import { storageService } from '@/lib/storage';
 
 const productSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
@@ -43,41 +45,67 @@ const categories: { value: ProductCategory; label: string }[] = [
   { value: 'Other', label: 'Other' },
 ];
 
-export default function NewProductPage() {
+export default function EditProductPage() {
   const router = useRouter();
-  const { addProduct } = useProductStore();
+  const params = useParams();
+  const productId = params.id as string;
+  const { user } = useAuthStore();
+  const { updateProduct, loadProducts } = useProductStore();
   const [imageUrl, setImageUrl] = useState<string>('');
+  const [product, setProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    reset,
   } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
-    defaultValues: {
-      title: '',
-      description: '',
-      category: 'Other',
-      condition: 'Good',
-    },
   });
+
+  useEffect(() => {
+    loadProducts();
+    const foundProduct = storageService.getProductById(productId);
+
+    if (foundProduct) {
+      if (user && foundProduct.sellerId !== user.id) {
+        toast.error('You can only edit your own listings');
+        router.push('/my-listings');
+        return;
+      }
+
+      setProduct(foundProduct);
+      setImageUrl(foundProduct.imageUrl || '');
+      reset({
+        title: foundProduct.title,
+        description: foundProduct.description,
+        category: foundProduct.category,
+        price: foundProduct.price,
+        condition: foundProduct.condition || 'Good',
+      });
+    } else {
+      toast.error('Product not found');
+      router.push('/my-listings');
+    }
+    setIsLoading(false);
+  }, [productId, user, router, reset, loadProducts]);
 
   const onSubmit = async (data: ProductFormData) => {
     try {
-      const product = await addProduct({
+      const updatedProduct = await updateProduct(productId, {
         ...data,
         imageUrl: imageUrl || undefined,
-        isAvailable: true,
       });
 
-      if (product) {
-        toast.success('Product listed successfully!');
+      if (updatedProduct) {
+        toast.success('Product updated successfully!');
         router.push('/my-listings');
       } else {
-        toast.error('Failed to create product listing');
+        toast.error('Failed to update product');
       }
     } catch (error) {
-      toast.error('An error occurred while creating your listing');
+      toast.error('An error occurred while updating your listing');
     }
   };
 
@@ -92,9 +120,24 @@ export default function NewProductPage() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation currentPage="/my-listings" />
+        <div className="flex items-center justify-center h-[60vh]">
+          <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation currentPage="/products/new" />
+      <Navigation currentPage="/my-listings" />
 
       <div className="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
@@ -106,9 +149,9 @@ export default function NewProductPage() {
             <ArrowLeft className="h-5 w-5 mr-2" />
             Back
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">Sell an Item</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Edit Listing</h1>
           <p className="mt-1 text-gray-600">
-            List your item and find it a new home
+            Update your product details
           </p>
         </div>
 
@@ -256,11 +299,11 @@ export default function NewProductPage() {
                 className="flex-1 inline-flex items-center justify-center px-4 py-2.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 ) : (
                   <Save className="h-4 w-4 mr-2" />
                 )}
-                List Product
+                Save Changes
               </button>
             </div>
           </form>

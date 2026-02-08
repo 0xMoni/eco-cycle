@@ -1,22 +1,26 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  experimental: {
-    // Allow external network access for mobile development
-    serverComponentsExternalPackages: [],
-  },
-  // Disable the Next.js development overlay completely
+  // External packages for server components
+  serverExternalPackages: [],
+  // Dev indicators position
   devIndicators: {
-    buildActivity: false,
-    buildActivityPosition: 'bottom-right',
+    position: 'bottom-right',
   },
-  // Additional config to disable overlay
   typescript: {
     ignoreBuildErrors: false,
   },
   eslint: {
     ignoreDuringBuilds: false,
+  },
+  // Allow images from external domains
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+    ],
   },
 };
 

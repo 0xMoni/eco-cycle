@@ -93,41 +93,29 @@ export default function MyListingsPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-3 rounded-lg bg-blue-100">
-                <Package className="h-6 w-6 text-blue-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Listings</p>
-                <p className="text-2xl font-bold text-gray-900">{userProducts.length}</p>
-              </div>
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          <div className="bg-white rounded-xl shadow p-5 text-center">
+            <div className="w-12 h-12 mx-auto rounded-full bg-blue-100 flex items-center justify-center mb-3">
+              <Package className="h-6 w-6 text-blue-600" />
             </div>
+            <p className="text-2xl font-bold text-gray-900">{userProducts.length}</p>
+            <p className="text-sm text-gray-500 mt-1">Listings</p>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-3 rounded-lg bg-green-100">
-                <span className="text-2xl font-bold text-green-600">₹</span>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Value</p>
-                <p className="text-2xl font-bold text-gray-900">₹{totalValue.toFixed(2)}</p>
-              </div>
+          <div className="bg-white rounded-xl shadow p-5 text-center">
+            <div className="w-12 h-12 mx-auto rounded-full bg-green-100 flex items-center justify-center mb-3">
+              <span className="text-xl font-bold text-green-600">₹</span>
             </div>
+            <p className="text-2xl font-bold text-gray-900">₹{totalValue.toFixed(0)}</p>
+            <p className="text-sm text-gray-500 mt-1">Total Value</p>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-3 rounded-lg bg-purple-100">
-                <Eye className="h-6 w-6 text-purple-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Views</p>
-                <p className="text-2xl font-bold text-gray-900">0</p>
-              </div>
+          <div className="bg-white rounded-xl shadow p-5 text-center">
+            <div className="w-12 h-12 mx-auto rounded-full bg-purple-100 flex items-center justify-center mb-3">
+              <Eye className="h-6 w-6 text-purple-600" />
             </div>
+            <p className="text-2xl font-bold text-gray-900">0</p>
+            <p className="text-sm text-gray-500 mt-1">Views</p>
           </div>
         </div>
 

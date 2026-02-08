@@ -4,19 +4,13 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { useProductStore } from '@/store/productStore';
-import { useCartStore } from '@/store/cartStore';
 import Navigation from '@/components/Navigation';
 import { Product } from '@/types';
-import { 
-  Star,
-  Eye,
-  Package
-} from 'lucide-react';
+import { Package } from 'lucide-react';
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
   const { products, loadProducts } = useProductStore();
-  const { totalItems, totalPrice } = useCartStore();
 
   useEffect(() => {
     loadProducts();
@@ -46,16 +40,13 @@ export default function DashboardPage() {
         {/* Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Recent Products */}
-          <div className="bg-white rounded-lg shadow">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900 flex items-center">
-                <Eye className="h-5 w-5 mr-2 text-green-600" />
-                Recent Listings
-              </h2>
+          <div className="bg-white rounded-xl shadow-sm">
+            <div className="px-5 py-4 border-b border-gray-100">
+              <h2 className="text-lg font-semibold text-gray-900">Recent Listings</h2>
             </div>
-            <div className="p-6">
+            <div className="p-5">
               {recentProducts.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {recentProducts.map((product) => (
                     <ProductCard key={product.id} product={product} />
                   ))}
@@ -69,24 +60,21 @@ export default function DashboardPage() {
           </div>
 
           {/* My Listings */}
-          <div className="bg-white rounded-lg shadow">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900 flex items-center">
-                <Package className="h-5 w-5 mr-2 text-blue-600" />
-                My Listings
-              </h2>
+          <div className="bg-white rounded-xl shadow-sm">
+            <div className="px-5 py-4 border-b border-gray-100">
+              <h2 className="text-lg font-semibold text-gray-900">My Listings</h2>
             </div>
-            <div className="p-6">
+            <div className="p-5">
               {userProducts.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {userProducts.slice(0, 3).map((product) => (
                     <ProductCard key={product.id} product={product} isOwner />
                   ))}
                   {userProducts.length > 3 && (
-                    <div className="text-center pt-4">
+                    <div className="text-center pt-3">
                       <a
                         href="/my-listings"
-                        className="text-green-600 hover:text-green-700 font-medium"
+                        className="text-sm text-green-600 hover:text-green-700 font-medium"
                       >
                         View all {userProducts.length} listings →
                       </a>
@@ -95,13 +83,12 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500 mb-4">You haven't listed any items yet</p>
+                  <Package className="h-10 w-10 text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-500 mb-4 text-sm">You haven&apos;t listed any items yet</p>
                   <a
                     href="/products/new"
-                    className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                    className="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
                   >
-                    <Star className="h-4 w-4 mr-2" />
                     List Your First Item
                   </a>
                 </div>
@@ -169,35 +156,33 @@ interface ProductCardProps {
 function ProductCard({ product, isOwner }: ProductCardProps) {
   return (
     <Link href={`/products/${product.id}`}>
-      <div className="flex items-center space-x-4 p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
-        <div className="flex-shrink-0">
-          <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
-            {product.imageUrl ? (
-              <img
-                src={product.imageUrl}
-                alt={product.title}
-                className="w-full h-full object-cover rounded-lg"
-              />
-            ) : (
-              <Package className="h-8 w-8 text-gray-400" />
-            )}
-          </div>
+      <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">
+        <div className="w-14 h-14 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden">
+          {product.imageUrl ? (
+            <img
+              src={product.imageUrl}
+              alt={product.title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <Package className="h-6 w-6 text-gray-300" />
+            </div>
+          )}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-medium text-gray-900 truncate hover:text-green-600">
+          <h3 className="text-sm font-medium text-gray-900 truncate">
             {product.title}
           </h3>
-          <p className="text-sm text-gray-500">{product.category}</p>
-          <p className="text-sm font-semibold text-green-600">
+          <p className="text-xs text-gray-500">{product.category}</p>
+          <p className="text-sm font-bold text-green-600 mt-0.5">
             ₹{product.price}
           </p>
         </div>
         {isOwner && (
-          <div className="flex-shrink-0">
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-              Your Item
-            </span>
-          </div>
+          <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+            Yours
+          </span>
         )}
       </div>
     </Link>

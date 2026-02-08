@@ -26,11 +26,10 @@ export const useProductStore = create<ProductState>((set, get) => ({
   loadProducts: () => {
     set({ isLoading: true });
     const products = storageService.getProducts();
-    console.log('Loading products:', products.length);
-    set({ 
-      products, 
-      filteredProducts: products, 
-      isLoading: false 
+    set({
+      products,
+      filteredProducts: products,
+      isLoading: false
     });
   },
 

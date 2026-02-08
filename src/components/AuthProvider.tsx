@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { storageService } from '@/lib/storage';
 
@@ -12,33 +12,37 @@ interface AuthProviderProps {
 export default function AuthProvider({ children }: AuthProviderProps) {
   const { initializeAuth, isAuthenticated } = useAuthStore();
   const router = useRouter();
+  const pathname = usePathname();
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
+    // One-time data reset for version 3 (fixes date parsing issues)
+    if (typeof window !== 'undefined') {
+      const version = localStorage.getItem('ecocycle_version');
+      if (version !== '3') {
+        localStorage.removeItem('ecocycle_data');
+        localStorage.setItem('ecocycle_version', '3');
+      }
+    }
+
     // Initialize storage and authentication
     storageService.loadFromLocalStorage();
-    
-    // Only initialize sample data if no data exists
-    if (storageService.getUsers().length === 0 || storageService.getProductsCount() === 0) {
-      console.log('No users or products found, initializing sample data');
+
+    // Only initialize sample data if no users exist
+    if (storageService.getUsers().length === 0) {
       storageService.initializeSampleData();
-    } else {
-      console.log('Data found, skipping sample data initialization');
     }
-    
+
     initializeAuth();
-    
-    // Expose storageService to window for debugging
-    if (typeof window !== 'undefined') {
-      (window as any).storageService = storageService;
-    }
+    setIsInitialized(true);
   }, [initializeAuth]);
 
   useEffect(() => {
-    // Redirect to login if not authenticated
-    if (!isAuthenticated) {
+    // Only redirect after initialization is complete
+    if (isInitialized && !isAuthenticated && pathname !== '/auth/login') {
       router.push('/auth/login');
     }
-  }, [isAuthenticated, router]);
+  }, [isInitialized, isAuthenticated, pathname, router]);
 
   return <>{children}</>;
 }

@@ -200,25 +200,21 @@ export default function ProfilePage() {
             </div>
 
             {/* Stats Section */}
-            <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="bg-white rounded-lg shadow p-8">
-                <div className="text-center">
-                  <div className="mx-auto w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                    <Package className="h-8 w-8 text-blue-600" />
-                  </div>
-                  <p className="text-base font-medium text-gray-600">My Listings</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">{userProducts.length}</p>
+            <div className="mt-8 grid grid-cols-2 gap-4">
+              <div className="bg-white rounded-xl shadow p-6 text-center">
+                <div className="w-14 h-14 mx-auto rounded-full bg-blue-100 flex items-center justify-center mb-3">
+                  <Package className="h-7 w-7 text-blue-600" />
                 </div>
+                <p className="text-3xl font-bold text-gray-900">{userProducts.length}</p>
+                <p className="text-sm text-gray-500 mt-1">Listings</p>
               </div>
 
-              <div className="bg-white rounded-lg shadow p-8">
-                <div className="text-center">
-                  <div className="mx-auto w-16 h-16 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
-                    <span className="text-2xl font-bold text-yellow-600">₹</span>
-                  </div>
-                  <p className="text-base font-medium text-gray-600">Total Value</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">₹{totalValue.toFixed(2)}</p>
+              <div className="bg-white rounded-xl shadow p-6 text-center">
+                <div className="w-14 h-14 mx-auto rounded-full bg-green-100 flex items-center justify-center mb-3">
+                  <span className="text-xl font-bold text-green-600">₹</span>
                 </div>
+                <p className="text-3xl font-bold text-gray-900">₹{totalValue.toFixed(0)}</p>
+                <p className="text-sm text-gray-500 mt-1">Total Value</p>
               </div>
             </div>
 

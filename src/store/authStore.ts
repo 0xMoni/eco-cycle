@@ -20,24 +20,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   login: async (email: string, password: string) => {
     set({ isLoading: true });
-    
+
     try {
-      // Simple demo authentication - in real app, this would be API call
       const user = storageService.getUserByEmail(email);
-      console.log('Login attempt for email:', email, 'User found:', user);
-      
+
       if (user) {
         storageService.setCurrentUser(user);
-        set({ 
-          user, 
-          isAuthenticated: true, 
-          isLoading: false 
+        set({
+          user,
+          isAuthenticated: true,
+          isLoading: false
         });
-        console.log('Login successful, user set:', user);
         return true;
       } else {
         set({ isLoading: false });
-        console.log('Login failed, user not found');
         return false;
       }
     } catch (error) {
@@ -103,10 +99,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   initializeAuth: () => {
     storageService.loadFromLocalStorage();
     const currentUser = storageService.getCurrentUser();
-    console.log('Initializing auth, current user:', currentUser);
-    set({ 
-      user: currentUser, 
-      isAuthenticated: !!currentUser 
+    set({
+      user: currentUser,
+      isAuthenticated: !!currentUser
     });
   },
 }));

@@ -5,14 +5,15 @@ import { useParams, useRouter } from 'next/navigation';
 import { useProductStore } from '@/store/productStore';
 import { useCartStore } from '@/store/cartStore';
 import { useAuthStore } from '@/store/authStore';
+import { storageService } from '@/lib/storage';
 import Navigation from '@/components/Navigation';
 import { toast } from 'react-hot-toast';
-import { 
-  ArrowLeft, 
-  ShoppingCart, 
-  Package, 
-  User, 
-  Calendar, 
+import {
+  ArrowLeft,
+  ShoppingCart,
+  Package,
+  User,
+  Calendar,
   Tag,
   Heart,
   Share2,
@@ -24,7 +25,7 @@ export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { user } = useAuthStore();
-  const { getProductById } = useProductStore();
+  const { loadProducts } = useProductStore();
   const { addToCart } = useCartStore();
   
   const [product, setProduct] = useState<Product | null>(null);
@@ -32,13 +33,14 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
+    loadProducts();
     const productId = params.id as string;
     if (productId) {
-      const foundProduct = getProductById(productId);
+      const foundProduct = storageService.getProductById(productId);
       setProduct(foundProduct);
       setIsLoading(false);
     }
-  }, [params.id, getProductById]);
+  }, [params.id, loadProducts]);
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -200,6 +202,34 @@ export default function ProductDetailPage() {
                   <dd className="text-sm text-gray-900">{product.category}</dd>
                 </div>
                 <div className="flex justify-between">
+                  <dt className="text-sm font-medium text-gray-500">Condition</dt>
+                  <dd className="text-sm text-gray-900">{product.condition || 'Good'}</dd>
+                </div>
+                {product.brand && (
+                  <div className="flex justify-between">
+                    <dt className="text-sm font-medium text-gray-500">Brand</dt>
+                    <dd className="text-sm text-gray-900">{product.brand}</dd>
+                  </div>
+                )}
+                {product.model && (
+                  <div className="flex justify-between">
+                    <dt className="text-sm font-medium text-gray-500">Model</dt>
+                    <dd className="text-sm text-gray-900">{product.model}</dd>
+                  </div>
+                )}
+                {product.color && (
+                  <div className="flex justify-between">
+                    <dt className="text-sm font-medium text-gray-500">Color</dt>
+                    <dd className="text-sm text-gray-900">{product.color}</dd>
+                  </div>
+                )}
+                {product.yearOfManufacture && (
+                  <div className="flex justify-between">
+                    <dt className="text-sm font-medium text-gray-500">Year</dt>
+                    <dd className="text-sm text-gray-900">{product.yearOfManufacture}</dd>
+                  </div>
+                )}
+                <div className="flex justify-between">
                   <dt className="text-sm font-medium text-gray-500">Listed</dt>
                   <dd className="text-sm text-gray-900 flex items-center">
                     <Calendar className="h-4 w-4 mr-1" />
@@ -207,12 +237,8 @@ export default function ProductDetailPage() {
                   </dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-sm font-medium text-gray-500">Condition</dt>
-                  <dd className="text-sm text-gray-900">Used - Good</dd>
-                </div>
-                <div className="flex justify-between">
                   <dt className="text-sm font-medium text-gray-500">Availability</dt>
-                  <dd className="text-sm text-green-600 font-medium">
+                  <dd className={`text-sm font-medium ${product.isAvailable ? 'text-green-600' : 'text-red-600'}`}>
                     {product.isAvailable ? 'Available' : 'Sold'}
                   </dd>
                 </div>
