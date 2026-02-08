@@ -67,21 +67,6 @@ src/
 └── types/               # TypeScript types
 ```
 
-## Screenshots
-
-The app features a clean, green-themed UI focused on sustainability and ease of use.
-
----
-
-## Built With Claude
-
-This project was built in collaboration with **Claude** (Anthropic AI) through pair programming. Claude assisted with:
-
-- UI/UX improvements and responsive design
-- Bug fixes and code optimization
-- Feature implementation
-- Code cleanup and best practices
-
 ---
 
 Made with :seedling: for a sustainable future
